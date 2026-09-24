@@ -4,7 +4,10 @@
 const Database = require('better-sqlite3');
 const path = require('path');
 
-const DB_PATH = path.join(__dirname, 'data', 'payflow.db');
+const isServerless = !!(process.env.VERCEL || process.env.AWS_LAMBDA_FUNCTION_NAME);
+const DB_PATH = isServerless
+  ? path.join('/tmp', 'payflow.db')
+  : path.join(__dirname, 'data', 'payflow.db');
 
 let db;
 
@@ -127,7 +130,7 @@ function seedProducts() {
       id: 'prod_001',
       name: 'Premium Wireless Earbuds',
       description: 'High-fidelity audio with active noise cancellation, 36-hour battery life, and IPX5 water resistance.',
-      price: 2999,
+      price: 2,
       category: 'Electronics',
       image_url: '/api/placeholder/earbuds',
       stock: 50
@@ -136,7 +139,7 @@ function seedProducts() {
       id: 'prod_002',
       name: 'Leather Laptop Sleeve',
       description: 'Handcrafted genuine leather sleeve with magnetic closure. Fits 13-15 inch laptops.',
-      price: 1499,
+      price: 1,
       category: 'Accessories',
       image_url: '/api/placeholder/laptop-sleeve',
       stock: 30
@@ -145,7 +148,7 @@ function seedProducts() {
       id: 'prod_003',
       name: 'Smart Fitness Band',
       description: 'Track heart rate, sleep, SpO2, and 30+ workout modes. 14-day battery life with AMOLED display.',
-      price: 3499,
+      price: 3,
       category: 'Electronics',
       image_url: '/api/placeholder/fitness-band',
       stock: 100
@@ -154,7 +157,7 @@ function seedProducts() {
       id: 'prod_004',
       name: 'Organic Coffee Blend',
       description: 'Single-origin Arabica beans from Coorg, Karnataka. Medium roast, 250g pack.',
-      price: 599,
+      price: 1.2,
       category: 'Food & Beverage',
       image_url: '/api/placeholder/coffee',
       stock: 200
@@ -163,7 +166,7 @@ function seedProducts() {
       id: 'prod_005',
       name: 'Minimalist Desk Lamp',
       description: 'Touch-sensitive LED desk lamp with 5 brightness levels and USB-C charging port.',
-      price: 1899,
+      price: 1,
       category: 'Home & Office',
       image_url: '/api/placeholder/desk-lamp',
       stock: 45
@@ -172,7 +175,7 @@ function seedProducts() {
       id: 'prod_006',
       name: 'Canvas Backpack',
       description: 'Durable waxed canvas backpack with padded laptop compartment. 25L capacity.',
-      price: 2199,
+      price: 2,
       category: 'Accessories',
       image_url: '/api/placeholder/backpack',
       stock: 60
