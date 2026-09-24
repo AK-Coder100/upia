@@ -359,113 +359,217 @@ async function createOrder() {
 
 // ─── Payment Page ─────────────────────────────────────────────────────────────
 
+function switchPaymentTab(mode) {
+  const appView = document.getElementById('pay-mode-app-view');
+  const qrView = document.getElementById('pay-mode-qr-view');
+  const btnApp = document.getElementById('tab-btn-app');
+  const btnQr = document.getElementById('tab-btn-qr');
+
+  if (mode === 'app') {
+    if (appView) appView.style.display = 'block';
+    if (qrView) qrView.style.display = 'none';
+    if (btnApp) btnApp.classList.add('active');
+    if (btnQr) btnQr.classList.remove('active');
+  } else {
+    if (appView) appView.style.display = 'none';
+    if (qrView) qrView.style.display = 'block';
+    if (btnApp) btnApp.classList.remove('active');
+    if (btnQr) btnQr.classList.add('active');
+  }
+}
+
 function renderPaymentPage(orderData) {
   const content = document.getElementById('payment-content');
   const { order, items, payment } = orderData;
 
-  // Start a 15-minute timer
+  const appLinks = payment.app_links || {
+    generic: payment.upi_link,
+    gpay: payment.upi_link.replace('upi://pay?', 'tez://upi/pay?'),
+    phonepe: payment.upi_link.replace('upi://pay?', 'phonepe://pay?'),
+    paytm: payment.upi_link.replace('upi://pay?', 'paytmmp://pay?'),
+    bhim: payment.upi_link.replace('upi://pay?', 'bhim://pay?'),
+    cred: payment.upi_link.replace('upi://pay?', 'cred://pay?')
+  };
+
+  const isMobile = window.innerWidth <= 768 || /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent);
   let timeLeft = 15 * 60; // 15 minutes
 
   content.innerHTML = `
-    <div style="max-width: 900px; margin: 0 auto;">
-      <div class="page-header" style="text-align: center;">
-        <h1>Complete Your Payment</h1>
-        <p>Scan the QR code below with any UPI app to pay</p>
+    <div class="payment-wrapper">
+      <div class="page-header text-center" style="margin-bottom: 24px;">
+        <h1 style="font-size: 1.8rem; margin-bottom: 6px;">Pay via UPI</h1>
+        <p style="color: var(--text-muted); font-size: 0.9rem;">Fast, direct, and zero gateway charges</p>
       </div>
 
-      <div class="checkout-layout" style="grid-template-columns: 1fr 1fr;">
-        <!-- Left: Order Info -->
-        <div>
-          <div class="card" style="margin-bottom: 20px;">
-            <h3 style="margin-bottom: 16px; font-weight: 700; display: flex; align-items: center; gap: 8px;">
-              📋 Order Details
-              <span class="status-badge created">Created</span>
+      <div class="payment-grid-layout">
+        <!-- Order Summary Card -->
+        <div class="card payment-summary-card">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
+            <h3 style="font-weight: 700; font-size: 1.1rem; display: flex; align-items: center; gap: 8px; margin: 0;">
+              📋 Order Summary
             </h3>
-            <div style="font-family: var(--font-mono); font-size: 0.85rem; color: var(--accent-primary); margin-bottom: 16px;">
-              ${order.id}
-            </div>
-            ${items.map(item => `
-              <div style="display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid var(--border-color);">
-                <span style="color: var(--text-secondary);">${item.product_name} × ${item.quantity}</span>
-                <span style="font-weight: 600;">₹${formatPrice(item.total_price)}</span>
-              </div>
-            `).join('')}
-            <div style="display: flex; justify-content: space-between; padding: 12px 0; font-weight: 800; font-size: 1.1rem;">
-              <span>Total</span>
-              <span style="color: var(--success);">₹${formatPrice(order.total_amount)}</span>
-            </div>
+            <span class="status-badge created">Created</span>
           </div>
 
-          <div class="card">
-            <h3 style="margin-bottom: 12px; font-weight: 700;">💡 How to Pay</h3>
-            <div class="flow-steps" style="margin: 0;">
-              <div class="flow-step active">
-                <div class="step-num">1</div>
-                <div class="step-content">
-                  <h4>Open your UPI app</h4>
-                  <p>Google Pay, PhonePe, Paytm, or any UPI app</p>
-                </div>
+          <div class="order-id-badge" style="margin-bottom: 12px;">
+            <span>ID: <strong>${order.id}</strong></span>
+            <button class="btn-copy-chip" onclick="copyToClipboard('${order.id}')" title="Copy Order ID">📋 Copy</button>
+          </div>
+
+          <div class="order-items-scroll">
+            ${items.map(item => `
+              <div class="order-summary-row">
+                <span class="item-name">${item.product_name} <small class="text-muted">× ${item.quantity}</small></span>
+                <span class="item-price">₹${formatPrice(item.total_price)}</span>
               </div>
-              <div class="flow-step">
-                <div class="step-num">2</div>
-                <div class="step-content">
-                  <h4>Scan the QR code</h4>
-                  <p>Or copy the UPI ID and pay manually</p>
-                </div>
+            `).join('')}
+          </div>
+
+          <div class="order-total-row">
+            <span>Total Payable</span>
+            <span class="total-amount">₹${formatPrice(order.total_amount)}</span>
+          </div>
+
+          <div class="timer-banner" id="payment-timer">
+            ⏱️ <span id="timer-display">15:00</span> remaining to complete payment
+          </div>
+
+          <div class="flow-steps-compact hide-on-mobile" style="margin-top: 20px;">
+            <div class="flow-step active">
+              <div class="step-num">1</div>
+              <div class="step-content">
+                <h4>Open App / Scan</h4>
+                <p>Use GPay, PhonePe, Paytm, or BHIM</p>
               </div>
-              <div class="flow-step">
-                <div class="step-num">3</div>
-                <div class="step-content">
-                  <h4>Confirm payment</h4>
-                  <p>Click "I've Paid" below after completing payment</p>
-                </div>
+            </div>
+            <div class="flow-step">
+              <div class="step-num">2</div>
+              <div class="step-content">
+                <h4>Confirm & Enter UTR</h4>
+                <p>Submit 12-digit transaction ID below</p>
               </div>
             </div>
           </div>
         </div>
 
-        <!-- Right: Payment Panel -->
+        <!-- Payment Interactive Card -->
         <div class="payment-panel">
-          <div class="amount-display">${formatPrice(payment.amount)}</div>
-          <p style="color: var(--text-muted); font-size: 0.85rem;">Amount to pay</p>
-
-          <div class="qr-container">
-            ${payment.qr_code
-              ? `<img src="${payment.qr_code}" alt="UPI QR Code" width="280" height="280">`
-              : '<p style="color: #666; padding: 40px;">QR code unavailable</p>'
-            }
-          </div>
-
-          <div class="upi-id-display">
-            <span>UPI:</span>
-            <strong>${payment.merchant_upi_id}</strong>
-            <button class="btn btn-ghost btn-sm" onclick="copyToClipboard('${payment.merchant_upi_id}')" title="Copy UPI ID">📋</button>
-          </div>
-
-          <div class="payment-apps">
-            <a href="${payment.upi_link}" class="app-btn">📱 Open UPI App</a>
-            <button class="app-btn" onclick="copyToClipboard('${payment.upi_link}')">🔗 Copy Link</button>
-          </div>
-
-          <div class="timer-ring animate-pulse" id="payment-timer">
-            ⏱️ <span id="timer-display">15:00</span> remaining
-          </div>
-
-          <div class="payment-status waiting" id="payment-status">
-            <span class="animate-pulse">⏳</span> Waiting for payment...
-          </div>
-
-          <div class="section-divider" style="margin: 20px 0 16px;">After payment</div>
-
-          <div style="display: flex; flex-direction: column; gap: 10px;">
-            <div class="form-group" style="margin: 0; text-align: left;">
-              <label style="font-size: 0.8rem; color: var(--text-muted);">UPI Transaction ID (optional)</label>
-              <input type="text" id="upi-txn-id" placeholder="e.g. 326419876543" style="width: 100%; padding: 10px 14px; background: var(--bg-elevated); border: 1px solid var(--border-color); border-radius: var(--radius-sm); color: var(--text-primary); font-family: var(--font-mono); font-size: 0.85rem;">
+          <!-- Top Price Tag -->
+          <div class="mobile-amount-box">
+            <span class="amount-label">Pay Exactly</span>
+            <div class="amount-display">${formatPrice(payment.amount)}</div>
+            <div class="quick-copy-chips">
+              <button class="chip" onclick="copyToClipboard('${payment.merchant_upi_id}')">
+                UPI ID: <strong>${payment.merchant_upi_id}</strong> 📋
+              </button>
+              <button class="chip" onclick="copyToClipboard('${payment.amount}')">
+                Amount: <strong>₹${payment.amount}</strong> 📋
+              </button>
             </div>
-            <button class="btn btn-success btn-block btn-lg" onclick="confirmPayment('${order.id}')" id="btn-confirm-payment">
+          </div>
+
+          <!-- Mode Selector Tabs -->
+          <div class="pay-mode-selector">
+            <button type="button" class="pay-mode-btn ${isMobile ? 'active' : ''}" id="tab-btn-app" onclick="switchPaymentTab('app')">
+              📱 Pay via UPI App
+            </button>
+            <button type="button" class="pay-mode-btn ${!isMobile ? 'active' : ''}" id="tab-btn-qr" onclick="switchPaymentTab('qr')">
+              📷 Scan QR Code
+            </button>
+          </div>
+
+          <!-- Tab 1: App View -->
+          <div id="pay-mode-app-view" style="display: ${isMobile ? 'block' : 'none'};">
+            <p class="section-subtitle">Tap your preferred app to pay instantly:</p>
+            <div class="app-intent-grid">
+              <a href="${appLinks.gpay}" class="upi-app-card btn-gpay">
+                <span class="app-icon">🟢</span>
+                <span class="app-name">Google Pay</span>
+                <span class="app-arrow">➔</span>
+              </a>
+
+              <a href="${appLinks.phonepe}" class="upi-app-card btn-phonepe">
+                <span class="app-icon">🟣</span>
+                <span class="app-name">PhonePe</span>
+                <span class="app-arrow">➔</span>
+              </a>
+
+              <a href="${appLinks.paytm}" class="upi-app-card btn-paytm">
+                <span class="app-icon">🔵</span>
+                <span class="app-name">Paytm</span>
+                <span class="app-arrow">➔</span>
+              </a>
+
+              <a href="${appLinks.bhim}" class="upi-app-card btn-bhim">
+                <span class="app-icon">🟠</span>
+                <span class="app-name">BHIM UPI</span>
+                <span class="app-arrow">➔</span>
+              </a>
+
+              <a href="${appLinks.cred}" class="upi-app-card btn-cred">
+                <span class="app-icon">🖤</span>
+                <span class="app-name">CRED UPI</span>
+                <span class="app-arrow">➔</span>
+              </a>
+
+              <a href="${appLinks.generic}" class="upi-app-card btn-any-upi">
+                <span class="app-icon">⚡</span>
+                <span class="app-name">Any UPI App</span>
+                <span class="app-arrow">➔</span>
+              </a>
+            </div>
+
+            <div class="link-actions">
+              <button class="btn btn-ghost btn-block btn-sm" onclick="copyToClipboard('${payment.upi_link}')">
+                🔗 Copy UPI Payment Link
+              </button>
+            </div>
+          </div>
+
+          <!-- Tab 2: QR View -->
+          <div id="pay-mode-qr-view" style="display: ${!isMobile ? 'block' : 'none'};">
+            <div class="qr-container-responsive">
+              ${payment.qr_code
+                ? `<img src="${payment.qr_code}" alt="UPI QR Code" class="responsive-qr-img">`
+                : '<p style="color: #666; padding: 40px;">QR code unavailable</p>'
+              }
+            </div>
+            <p class="qr-hint">Scan with Google Pay, PhonePe, Paytm, or BHIM</p>
+            ${payment.qr_code ? `
+              <a href="${payment.qr_code}" download="payflow-qr-${order.id}.png" class="btn btn-ghost btn-sm" style="margin-top: 6px; display: inline-flex; align-items: center; gap: 6px;">
+                💾 Save QR Image
+              </a>
+            ` : ''}
+          </div>
+
+          <!-- Realtime Status -->
+          <div class="payment-status waiting" id="payment-status">
+            <span class="animate-pulse">⏳</span> Waiting for payment confirmation...
+          </div>
+
+          <!-- Verification Section -->
+          <div class="post-payment-box">
+            <div class="section-divider" style="margin: 16px 0 12px;">Step 2: Enter Transaction Details</div>
+            <div class="form-group" style="text-align: left; margin-bottom: 12px;">
+              <label for="upi-txn-id" style="font-size: 0.85rem; font-weight: 600; color: var(--text-secondary); display: flex; justify-content: space-between;">
+                <span>12-Digit UTR / Ref Number</span>
+                <span style="font-weight: 400; color: var(--text-muted); font-size: 0.75rem;">(Found in UPI App receipt)</span>
+              </label>
+              <input
+                type="text"
+                id="upi-txn-id"
+                inputmode="numeric"
+                pattern="[0-9]*"
+                maxlength="12"
+                placeholder="e.g. 326419876543"
+                class="mobile-touch-input"
+              >
+            </div>
+
+            <button class="btn btn-success btn-block btn-payment-action" onclick="confirmPayment('${order.id}')" id="btn-confirm-payment">
               ✅ I've Completed the Payment
             </button>
-            <button class="btn btn-ghost btn-block" onclick="navigateTo('store')">
+            <button class="btn btn-ghost btn-block btn-sm" onclick="navigateTo('store')" style="margin-top: 8px;">
               ← Back to Store
             </button>
           </div>

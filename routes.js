@@ -7,6 +7,7 @@ const { getDb } = require('./db');
 const {
   generateUpiLink,
   generateQrCode,
+  generateAppIntentLinks,
   generateWebhookSignature,
   verifyWebhookSignature,
   generatePaymentId,
@@ -149,6 +150,7 @@ router.post('/orders', async (req, res) => {
       items: orderItems,
       payment: {
         upi_link: upiLink,
+        app_links: generateAppIntentLinks({ amount: totalAmount, orderId }),
         qr_code: qrCode,
         merchant_upi_id: process.env.MERCHANT_UPI_ID || 'BHARATPE.8J0S0Z9W9S44900@FBPE',
         amount: totalAmount,
@@ -241,6 +243,7 @@ router.post('/orders/:id/payment-link', async (req, res) => {
     success: true,
     data: {
       upi_link: upiLink,
+      app_links: generateAppIntentLinks({ amount: order.total_amount, orderId: order.id }),
       qr_code: qrCode,
       merchant_upi_id: process.env.MERCHANT_UPI_ID || 'BHARATPE.8J0S0Z9W9S44900@FBPE',
       amount: order.total_amount,

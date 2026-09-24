@@ -1387,3 +1387,404 @@ img { max-width: 100%; height: auto; }
   font-family: var(--font-mono);
   margin-top: 12px;
 }
+
+/* ─── Mobile-Friendly Payment & Responsive System ────────────────────────── */
+.payment-wrapper {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 0 12px;
+}
+
+.payment-grid-layout {
+  display: grid;
+  grid-template-columns: 1fr 1.15fr;
+  gap: 24px;
+  align-items: start;
+}
+
+.order-id-badge {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: var(--bg-elevated);
+  padding: 8px 14px;
+  border-radius: var(--radius-sm);
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  color: var(--accent-primary);
+  border: 1px solid var(--border-color);
+}
+
+.btn-copy-chip {
+  background: transparent;
+  border: 1px solid var(--border-color);
+  color: var(--text-secondary);
+  font-size: 0.75rem;
+  padding: 4px 10px;
+  border-radius: var(--radius-full);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+.btn-copy-chip:hover {
+  background: var(--bg-hover);
+  color: var(--text-primary);
+}
+
+.order-summary-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--border-color);
+  font-size: 0.9rem;
+}
+
+.order-total-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 0 8px;
+  font-weight: 800;
+  font-size: 1.15rem;
+}
+.order-total-row .total-amount {
+  color: var(--success);
+  font-size: 1.35rem;
+}
+
+.timer-banner {
+  background: var(--warning-bg);
+  color: var(--warning);
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  font-weight: 600;
+  padding: 10px 14px;
+  border-radius: var(--radius-sm);
+  text-align: center;
+  margin-top: 14px;
+}
+
+/* Mobile Amount Box */
+.mobile-amount-box {
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(16, 185, 129, 0.08));
+  border: 1px solid rgba(99, 102, 241, 0.2);
+  border-radius: var(--radius-lg);
+  padding: 18px;
+  text-align: center;
+  margin-bottom: 20px;
+}
+.mobile-amount-box .amount-label {
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--text-muted);
+  font-weight: 600;
+}
+.mobile-amount-box .amount-display {
+  font-size: 2.4rem;
+  font-weight: 900;
+  color: var(--success);
+  margin: 4px 0 10px;
+}
+.mobile-amount-box .amount-display::before {
+  content: '₹';
+  font-size: 1.5rem;
+  vertical-align: super;
+  margin-right: 2px;
+}
+
+.quick-copy-chips {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+.quick-copy-chips .chip {
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-color);
+  color: var(--text-secondary);
+  font-size: 0.8rem;
+  padding: 6px 12px;
+  border-radius: var(--radius-full);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+.quick-copy-chips .chip:hover, .quick-copy-chips .chip:active {
+  background: var(--accent-primary);
+  color: #fff;
+  border-color: var(--accent-primary);
+}
+
+/* Segmented Mode Selector */
+.pay-mode-selector {
+  display: flex;
+  background: var(--bg-elevated);
+  padding: 4px;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border-color);
+  margin-bottom: 20px;
+  gap: 4px;
+}
+.pay-mode-btn {
+  flex: 1;
+  padding: 12px 14px;
+  border: none;
+  background: transparent;
+  color: var(--text-secondary);
+  font-weight: 600;
+  font-size: 0.9rem;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 44px;
+}
+.pay-mode-btn.active {
+  background: var(--accent-primary);
+  color: #ffffff;
+  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+}
+
+/* App Intent Grid */
+.section-subtitle {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  margin-bottom: 12px;
+  text-align: left;
+}
+.app-intent-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+  margin-bottom: 16px;
+}
+.upi-app-card {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 14px;
+  border-radius: var(--radius-md);
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 0.85rem;
+  transition: all var(--transition-fast);
+  min-height: 48px;
+  border: 1px solid var(--border-color);
+  box-shadow: var(--shadow-sm);
+}
+.upi-app-card:hover, .upi-app-card:active {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+.upi-app-card .app-icon {
+  font-size: 1.25rem;
+  line-height: 1;
+}
+.upi-app-card .app-name {
+  flex: 1;
+  text-align: left;
+}
+.upi-app-card .app-arrow {
+  opacity: 0.6;
+  font-size: 0.9rem;
+}
+
+/* App Brand Variants */
+.btn-gpay {
+  background: #ffffff;
+  color: #1f1f1f !important;
+  border-color: #dadce0;
+}
+.btn-phonepe {
+  background: #5f259f;
+  color: #ffffff !important;
+  border-color: #4d1d82;
+}
+.btn-paytm {
+  background: #002970;
+  color: #00b9f5 !important;
+  border-color: #001f54;
+}
+.btn-bhim {
+  background: #f37021;
+  color: #ffffff !important;
+  border-color: #d85c12;
+}
+.btn-cred {
+  background: #18181b;
+  color: #facc15 !important;
+  border-color: #27272a;
+}
+.btn-any-upi {
+  background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+  color: #ffffff !important;
+  border-color: transparent;
+  grid-column: span 2;
+}
+
+/* Responsive QR */
+.qr-container-responsive {
+  background: #ffffff;
+  border-radius: var(--radius-lg);
+  padding: 16px;
+  display: inline-block;
+  margin: 12px auto;
+  box-shadow: var(--shadow-md);
+  max-width: 100%;
+}
+.responsive-qr-img {
+  width: 100%;
+  max-width: 240px;
+  height: auto;
+  aspect-ratio: 1 / 1;
+  display: block;
+  margin: 0 auto;
+}
+.qr-hint {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  margin-top: 6px;
+}
+
+/* Mobile Touch Input */
+.mobile-touch-input {
+  width: 100%;
+  padding: 14px 16px;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  color: var(--text-primary);
+  font-family: var(--font-mono);
+  font-size: 1rem;
+  letter-spacing: 1px;
+  box-sizing: border-box;
+}
+.mobile-touch-input:focus {
+  border-color: var(--accent-primary);
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+}
+
+.btn-payment-action {
+  min-height: 52px;
+  font-size: 1rem;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+
+/* ─── Comprehensive Media Queries ────────────────────────────────────────── */
+
+@media (max-width: 992px) {
+  .checkout-layout,
+  .payment-grid-layout {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+
+  .payment-panel {
+    position: static;
+    top: 0;
+  }
+}
+
+@media (max-width: 768px) {
+  .container {
+    padding: 0 16px;
+  }
+
+  /* Navbar on Mobile */
+  .navbar {
+    padding: 0 16px;
+  }
+  .navbar-inner {
+    flex-wrap: wrap;
+    gap: 8px;
+    padding: 8px 0;
+  }
+
+  .navbar-nav {
+    width: 100%;
+    overflow-x: auto;
+    white-space: nowrap;
+    display: flex;
+    gap: 6px;
+    padding-bottom: 4px;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+  }
+  .navbar-nav::-webkit-scrollbar {
+    display: none;
+  }
+  .navbar-nav li {
+    flex-shrink: 0;
+  }
+  .nav-link {
+    padding: 6px 10px;
+    font-size: 0.8rem;
+  }
+
+  /* Product Catalog Grid on Mobile */
+  .product-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  /* Payment Panel */
+  .payment-panel {
+    padding: 20px 16px;
+  }
+
+  .app-intent-grid {
+    grid-template-columns: 1fr;
+  }
+  .btn-any-upi {
+    grid-column: span 1;
+  }
+
+  .hide-on-mobile {
+    display: none !important;
+  }
+
+  /* Cart Drawer Fullscreen on Mobile */
+  .cart-drawer {
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+
+  /* Prevent iOS automatic zoom on focus */
+  .checkout-form input,
+  .checkout-form textarea,
+  .form-group input,
+  .form-group textarea,
+  .mobile-touch-input {
+    font-size: 16px !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .mobile-amount-box .amount-display {
+    font-size: 2rem;
+  }
+
+  .pay-mode-btn {
+    font-size: 0.82rem;
+    padding: 10px 8px;
+  }
+
+  .order-id-badge {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+  }
+
+  .quick-copy-chips {
+    flex-direction: column;
+  }
+  .quick-copy-chips .chip {
+    width: 100%;
+    text-align: center;
+  }
+}
+

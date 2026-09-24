@@ -1,0 +1,33 @@
+{
+  "name": "node-upi-service",
+  "version": "1.0.0",
+  "description": "Zero-gateway UPI payment link generator, dynamic QR codes, app intent links, and webhook signature verification for Node.js, Express, and Next.js.",
+  "main": "index.js",
+  "types": "index.d.ts",
+  "scripts": {
+    "test": "node test.js"
+  },
+  "keywords": [
+    "upi",
+    "upi-payment",
+    "payment-gateway",
+    "india",
+    "npci",
+    "gpay",
+    "phonepe",
+    "paytm",
+    "bhim",
+    "qr-code",
+    "webhook",
+    "express",
+    "nextjs"
+  ],
+  "author": "PayFlow",
+  "license": "MIT",
+  "dependencies": {
+    "qrcode": "^1.5.4"
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  }
+}
