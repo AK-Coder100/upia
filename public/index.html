@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="PayFlow — Self-hosted UPI Payment Gateway with Two-Phase Verification. Secure, fast, and reliable payment processing.">
+  <title>PayFlow — UPI Payment Gateway</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚡</text></svg>">
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+  <div id="app">
+    <!-- ─── Navbar ──────────────────────────────────────────────────── -->
+    <nav class="navbar">
+      <div class="navbar-inner">
+        <div class="navbar-brand" onclick="navigateTo('store')">
+          <div class="logo-icon">⚡</div>
+          <span>PayFlow</span>
+        </div>
+        <ul class="navbar-nav">
+          <li><button class="nav-link active" data-page="store" onclick="navigateTo('store')">🏪 Store</button></li>
+          <li><button class="nav-link" data-page="dashboard" onclick="navigateTo('dashboard')">📊 Dashboard</button></li>
+          <li><button class="nav-link" data-page="orders" onclick="navigateTo('orders')">📋 Orders</button></li>
+          <li><button class="nav-link" data-page="architecture" onclick="navigateTo('architecture')">🏗️ Architecture</button></li>
+          <li>
+            <button class="nav-link cart-badge" onclick="toggleCart()">
+              🛒 Cart
+              <span class="badge" id="cart-count" style="display:none">0</span>
+            </button>
+          </li>
+        </ul>
+      </div>
+    </nav>
+
+    <!-- ─── Store Page ──────────────────────────────────────────────── -->
+    <div id="page-store" class="page active">
+      <div class="container">
+        <div class="page-header">
+          <h1>Product Catalog</h1>
+          <p>Browse our premium collection and pay instantly via UPI</p>
+        </div>
+        <div class="product-grid" id="product-grid">
+          <div class="loading-overlay">
+            <div class="spinner"></div>
+            <span>Loading products...</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ─── Checkout Page ───────────────────────────────────────────── -->
+    <div id="page-checkout" class="page">
+      <div class="container">
+        <div class="page-header">
+          <h1>Checkout</h1>
+          <p>Complete your details and pay via UPI</p>
+        </div>
+        <div class="checkout-layout" id="checkout-layout">
+          <!-- Dynamically rendered -->
+        </div>
+      </div>
+    </div>
+
+    <!-- ─── Payment Page ────────────────────────────────────────────── -->
+    <div id="page-payment" class="page">
+      <div class="container">
+        <div id="payment-content">
+          <!-- Dynamically rendered -->
+        </div>
+      </div>
+    </div>
+
+    <!-- ─── Receipt Page ────────────────────────────────────────────── -->
+    <div id="page-receipt" class="page">
+      <div class="container">
+        <div id="receipt-content">
+          <!-- Dynamically rendered -->
+        </div>
+      </div>
+    </div>
+
+    <!-- ─── Dashboard Page ──────────────────────────────────────────── -->
+    <div id="page-dashboard" class="page">
+      <div class="container">
+        <div class="page-header">
+          <h1>Dashboard</h1>
+          <p>Real-time payment analytics and system health</p>
+        </div>
+        <div id="dashboard-content">
+          <div class="loading-overlay">
+            <div class="spinner"></div>
+            <span>Loading dashboard...</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ─── Orders Page ─────────────────────────────────────────────── -->
+    <div id="page-orders" class="page">
+      <div class="container">
+        <div class="page-header">
+          <h1>Order Management</h1>
+          <p>View and manage all orders, process payments, and track webhooks</p>
+        </div>
+        <div id="orders-content">
+          <div class="loading-overlay">
+            <div class="spinner"></div>
+            <span>Loading orders...</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ─── Architecture Page ───────────────────────────────────────── -->
+    <div id="page-architecture" class="page">
+      <div class="container">
+        <div class="page-header">
+          <h1>Architecture & Flow</h1>
+          <p>Two-Phase Verification — How payments work in PayFlow</p>
+        </div>
+        <div id="architecture-content">
+          <!-- Rendered below -->
+        </div>
+      </div>
+    </div>
+
+    <!-- ─── Cart Drawer ─────────────────────────────────────────────── -->
+    <div class="cart-overlay" id="cart-overlay" onclick="toggleCart()"></div>
+    <div class="cart-drawer" id="cart-drawer">
+      <div class="cart-header">
+        <h2>🛒 Your Cart</h2>
+        <button class="btn btn-ghost btn-sm" onclick="toggleCart()">✕</button>
+      </div>
+      <div class="cart-body" id="cart-body">
+        <div class="cart-empty">
+          <div class="icon">🛒</div>
+          <p>Your cart is empty</p>
+        </div>
+      </div>
+      <div class="cart-footer" id="cart-footer" style="display:none">
+        <div class="cart-total">
+          <span class="label">Total</span>
+          <span class="amount" id="cart-total-amount">₹0</span>
+        </div>
+        <button class="btn btn-primary btn-block btn-lg" onclick="proceedToCheckout()">
+          Proceed to Checkout →
+        </button>
+      </div>
+    </div>
+
+    <!-- ─── Order Detail Modal ──────────────────────────────────────── -->
+    <div class="modal-overlay" id="order-modal">
+      <div class="modal">
+        <div class="modal-header">
+          <h2 id="modal-title">Order Details</h2>
+          <button class="btn btn-ghost btn-sm" onclick="closeModal()">✕</button>
+        </div>
+        <div class="modal-body" id="modal-body">
+          <!-- Dynamic -->
+        </div>
+        <div class="modal-footer" id="modal-footer">
+          <button class="btn btn-secondary" onclick="closeModal()">Close</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ─── Toast Container ─────────────────────────────────────────── -->
+    <div class="toast-container" id="toast-container"></div>
+  </div>
+
+  <script src="/app.js"></script>
+</body>
+</html>
